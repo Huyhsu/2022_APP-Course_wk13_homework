@@ -2,17 +2,20 @@ import React, { useEffect, useState } from "react";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Box, Center } from "native-base";
+import { Box, Center, Pressable, Actionsheet, useDisclose } from "native-base";
 
-import metroJson from "../json/metro.json";
+import ActionButton from "../components/ActionButton";
+import ActionScreen from "./ActionScreen";
+
 import { getUbikeInfo } from "../api";
+import metroJson from "../json/taipeiMetro.json";
 import mapStyle from "../mapStyle/mapStyle.json";
 
 const MapScreen = () => {
   const [msg, setMsg] = useState("Waiting...");
-  // 臺北市捷運站點資料(大安區)
+  // 臺北市捷運站點資料 (臺北市)
   const [metro, setMetro] = useState(metroJson);
-  // youbike資料(大安區)
+  // youbike資料 (大安區)
   const [ubike, setUbike] = useState([]);
   // 是否已定位位置
   const [onCurrentLocation, setOnCurrentLocation] = useState(false);
@@ -97,6 +100,11 @@ const MapScreen = () => {
     getUbikeData();
   }, []);
 
+  // Pressable in marker onPress 有問題
+  const { isOpen, onOpen, onClose } = useDisclose();
+  // 設定點選的 ubike site
+  const [ubikeSite, setUbikeStatioin] = useState({});
+
   return (
     <Box flex={1}>
       <MapView
@@ -127,17 +135,18 @@ const MapScreen = () => {
               key={site.StationUID}
               title={site.StationName.Zh_tw}
               description={site.StationAddress}
+              tracksViewChanges={false}
             >
               <Center
                 bg="#cad4bc"
                 borderRadius={60}
                 p={2 * zoomRatio}
                 borderWidth={2}
-                borderColor="black"
+                borderColor="#0288D1"
               >
                 <MaterialCommunityIcons
                   name={"train"}
-                  size={26 * zoomRatio}
+                  size={14 * zoomRatio}
                   color={"#252b16"}
                 />
               </Center>
@@ -151,29 +160,24 @@ const MapScreen = () => {
                 longitude: Number(site.lng),
               }}
               key={site.sno}
-              title={`${site.sna} ${site.sbi}/${site.bemp}`}
+              title={`${site.sna} ${site.sbi}/${site.bemp + site.sbi}`}
               description={site.ar}
+              tracksViewChanges={false}
+              onPress={() => {
+                setUbikeStatioin(site);
+                // console.log("I am working");
+                onOpen();
+              }}
             >
-              {/* <ActionButton zoomRatio={zoomRatio} site={site} /> */}
-              <Center
-                bg="#cad4bc"
-                borderRadius={60}
-                p={2 * zoomRatio}
-                borderWidth={2}
-                borderColor="black"
-              >
-                <MaterialCommunityIcons
-                  name={"bike"}
-                  size={26 * zoomRatio}
-                  color={"#252b16"}
-                />
-              </Center>
+              <Pressable onPress={() => console.log("I am not working")}>
+                <ActionButton zoomRatio={zoomRatio} site={site} />
+              </Pressable>
             </Marker>
           ))}
       </MapView>
       {!onCurrentLocation && (
         <Box
-          bg={"#cad4bc"}
+          bg={"#FCFAF2"}
           borderRadius={60}
           position={"absolute"}
           shadow={"2"}
@@ -189,6 +193,9 @@ const MapScreen = () => {
           />
         </Box>
       )}
+      <Actionsheet isOpen={isOpen} onClose={onClose}>
+        <ActionScreen onClose={onClose} site={ubikeSite} />
+      </Actionsheet>
     </Box>
   );
 };

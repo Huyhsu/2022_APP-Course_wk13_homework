@@ -1,6 +1,6 @@
 import React from "react";
 import { Center, Pressable, Actionsheet, useDisclose } from "native-base";
-import Icon from "react-native-vector-icons/FontAwesome";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ActionScreen from "../screens/ActionScreen";
 
 export default (props) => {
@@ -9,20 +9,27 @@ export default (props) => {
 
   return (
     <>
-      <Pressable onPress={onOpen}>
+      <Pressable
+        // onPress={onOpen}
+        onPress={() => console.log("I am not working")}
+      >
         <Center
-          bg="white"
+          bg="#cad4bc"
           borderRadius={60}
-          p={3 * zoomRatio}
-          borderWidth={2 * zoomRatio}
-          borderColor="black"
+          p={2 * zoomRatio}
+          borderWidth={2}
+          borderColor="#FFCA28"
         >
-          <Icon name={"bicycle"} size={30 * zoomRatio} color="black" />
+          <MaterialCommunityIcons
+            name={"bike"}
+            size={14 * zoomRatio}
+            color={"#252b16"}
+          />
         </Center>
       </Pressable>
-      <Actionsheet isOpen={isOpen} onClose={onClose}>
+      {/* <Actionsheet isOpen={isOpen} onClose={onClose}>
         <ActionScreen onClose={onClose} site={site} />
-      </Actionsheet>
+      </Actionsheet> */}
     </>
   );
 };
